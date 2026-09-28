@@ -45,6 +45,12 @@ for c in cols_to_check:
 | **2** | **Điều tra giá trị ngoại lệ (Outliers Investigation)** | Trích xuất top 5 giá trị lớn nhất từ các cột thông số (như `PM2.5`, `PM10`, `NOx`,...) và kiểm tra các dòng dữ liệu tương ứng. | Ghi nhận các giá trị nồng độ ô nhiễm cao (ví dụ `PM10` đạt gần 675) kèm theo một số giá trị thiếu (`NaN`) ở cột `PM2.5`/`NH3`. | Phân định rõ ràng giữa lỗi ghi nhận hệ thống (Error) và hiện tượng thời tiết/môi trường thực tế (Real). |
 | **3** | **Chuẩn hóa văn bản (Text Standardization)** | Kiểm tra số lượng giá trị distinct và áp dụng định dạng chuẩn (`.str.lower().str.strip()`) cho các cột `StationId` và `Datetime`. | Cột `StationId` giữ nguyên 110 giá trị unique; cột `Datetime` duy trì 48.192 giá trị phân biệt. | Đảm bảo tính nhất quán của dữ liệu định danh và thời gian trước khi tiến hành thực hiện các bước xử lý hoặc liên kết tiếp theo. |
 
+#Nguồn gốc và giá trị câu 2
+Các dòng có giá trị chỉ số ô nhiễm rất cao (ví dụ: PM10 hoặc NO đạt giá trị lớn đột biến) phản ánh hiện tượng thực tế (Real) tại các trạm quan trắc vào thời điểm ô nhiễm nặng, do điều kiện thời tiết hoặc lượng phương tiện/khói bụi tăng cao đột ngột.
+Nếu trong 5 dòng có xuất hiện các ô chứa giá trị NaN (trống), đó là do cảm biến hoặc thiết bị truyền tin của trạm gặp sự cố mất dữ liệu tại thời điểm đó, đây là lỗi hệ thống ghi nhận (Error).
 
+#Kết luận câu 2
+Đa phần các giá trị lớn là thực tế (Real), giữ lại hoặc áp dụng phương pháp giới hạn (Winsorizing) thay vì xóa bỏ.
+Các giá trị thiếu (NaN) là lỗi ghi nhận (Error), cần được xử lý điền khuyết (fillna) để không làm gián đoạn quá trình phân tích.
 
   
