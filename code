@@ -1,0 +1,50 @@
+#Ex 1
+import numpy as np
+import pandas as pd
+
+col = "PM10"
+
+Q1 = df[col].quantile(0.25)
+Q3 = df[col].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound_iqr = Q1 - 1.5 * IQR
+upper_bound_iqr = Q3 + 1.5 * IQR
+outliers_iqr = df[
+    (df[col] < lower_bound_iqr) | (df[col] > upper_bound_iqr)
+]
+print(f"Số lượng ngoại lệ theo IQR: {len(outliers_iqr)}")
+
+z_scores = np.abs((df[col] - df[col].mean()) / df[col].std())
+outliers_z = df[z_scores > 3]
+print(f"Số lượng ngoại lệ theo Z-Score (threshold > 3): {len(outliers_z)}")
+
+print(f"Số dòng bị flag bởi cả hai phương pháp:")
+common_outliers = pd.merge(outliers_iqr, outliers_z, how="inner")
+print(len(common_outliers))
+
+#Ex 2
+top_5_largest = df.nlargest(5, "NOx")
+print(top_5_largest[["PM2.5", "PM10", "NO", "NO2", "NH3"]])
+
+#Ex 3
+cols_to_check = ["StationId", "Datetime"]
+
+for c in cols_to_check:
+    print(f"--- Cột: {c} ---")
+    print(f"Distinct trước: {df[c].nunique()}")
+
+    df[c] = df[c].astype(str).str.strip()
+    print(f"Distinct sau: {df[c].nunique()}")
+
+#Ex 4
+## Nhật ký Làm sạch Dữ liệu - File `station_hour.csv`
+
+| Stt | Các bước thực hiện (Steps) | Thao tác / Phương pháp (Actions) | Kết quả ghi nhận (Findings / Results) | Lý do quyết định (Rationale) |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | **Phát hiện ngoại lệ (Outliers Detection)** | Sử dụng phương pháp IQR ($1.5 \times IQR$) và Z-Score (ngưỡng $> 3$) trên cột `PM10`. | Phát hiện 87.804 dòng ngoại lệ bằng IQR và 30.312 dòng bằng Z-Score; trong đó có 30.312 dòng bị flag đồng thời bởi cả hai phương pháp. | Xác định mức độ phân tán và lọc các điểm dữ liệu bất thường cực đoan để phục vụ phân tích chính xác hơn. |
+| **2** | **Điều tra giá trị ngoại lệ (Outliers Investigation)** | Trích xuất top 5 giá trị lớn nhất từ các cột thông số (như `PM2.5`, `PM10`, `NOx`,...) và kiểm tra các dòng dữ liệu tương ứng. | Ghi nhận các giá trị nồng độ ô nhiễm cao (ví dụ `PM10` đạt gần 675) kèm theo một số giá trị thiếu (`NaN`) ở cột `PM2.5`/`NH3`. | Phân định rõ ràng giữa lỗi ghi nhận hệ thống (Error) và hiện tượng thời tiết/môi trường thực tế (Real). |
+| **3** | **Chuẩn hóa văn bản (Text Standardization)** | Kiểm tra số lượng giá trị distinct và áp dụng định dạng chuẩn (`.str.lower().str.strip()`) cho các cột `StationId` và `Datetime`. | Cột `StationId` giữ nguyên 110 giá trị unique; cột `Datetime` duy trì 48.192 giá trị phân biệt. | Đảm bảo tính nhất quán của dữ liệu định danh và thời gian trước khi tiến hành thực hiện các bước xử lý hoặc liên kết tiếp theo. |
+
+
+
+  
